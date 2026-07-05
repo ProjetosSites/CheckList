@@ -66,13 +66,21 @@ function getSavedPhotos() {
     return JSON.parse(localStorage.getItem('checklist_photos')) || [];
 }
 
-// 4. RENDERIZAÇÃO COM ABAS RETRÁTEIS
+// 4. RENDERIZAÇÃO COM TODAS AS MELHORIAS VISUAIS
 function loadAndRenderPhotos() {
     const photos = getSavedPhotos();
     galleryContainer.innerHTML = '';
 
     if (photos.length === 0) {
-        galleryContainer.innerHTML = `<p style="text-align:center; color:#94a3b8; margin-top:20px;">Nenhuma foto registrada no checklist ainda.</p>`;
+        galleryContainer.innerHTML = `
+            <div style="text-align:center; padding: 40px 20px; color:#64748b;">
+                <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none" style="margin: 0 auto 12px; opacity: 0.5;">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <p>Nenhuma foto registrada no checklist ainda.</p>
+            </div>`;
         return;
     }
 
@@ -82,33 +90,66 @@ function loadAndRenderPhotos() {
         return acc;
     }, {});
 
-    // Renderizar cada bloco de dia como uma aba recolhível
     for (const [dateStr, dayPhotos] of Object.entries(grouped)) {
         const daySection = document.createElement('div');
-        daySection.className = 'day-group'; // Pode adicionar 'active' aqui se quiser que o dia atual nasça aberto por padrão
+        daySection.className = 'day-group'; 
 
         let gridHtml = '';
         dayPhotos.forEach(photo => {
             gridHtml += `
                 <div class="photo-card">
-                    <a href="${photo.url}" target="_blank">
-                        <img src="${photo.url}" alt="Foto Checklist" loading="lazy">
-                    </a>
+                    <div class="photo-img-wrapper">
+                        <a href="${photo.url}" target="_blank">
+                            <img src="${photo.url}" alt="Foto Checklist" loading="lazy">
+                        </a>
+                        <span class="photo-time-overlay">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            ${photo.timeStr}
+                        </span>
+                    </div>
                     <div class="photo-info">
-                        <span class="photo-time">🕒 ${photo.timeStr}</span>
-                        <button class="btn-download-single" onclick="event.stopPropagation(); downloadPhoto('${photo.url}', 'checklist_${photo.dateStr.replaceAll('/','-')}_${photo.timeStr.replaceAll(':','-')}.jpg')">⬇️ Baixar</button>
+                        <button class="btn-download-single" onclick="event.stopPropagation(); downloadPhoto('${photo.url}', 'checklist_${photo.dateStr.replaceAll('/','-')}_${photo.timeStr.replaceAll(':','-')}.jpg')">
+                            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Baixar
+                        </button>
                     </div>
                 </div>
             `;
         });
 
-        // Estrutura HTML da Aba: Cabeçalho clicável + Bloco de Conteúdo que expande
+        // Estrutura com Pill Badge no Cabeçalho e Ícones Vetorial nos Botões
         daySection.innerHTML = `
             <div class="day-header" onclick="toggleSection(this)">
-                <h2 class="day-title">📅 ${dateStr}</h2>
+                <div class="day-title-wrapper">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="#3b82f6" stroke-width="2" fill="none">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span class="day-title">${dateStr}</span>
+                </div>
+                <div class="header-right">
+                    <span class="photo-badge">${dayPhotos.length} ${dayPhotos.length === 1 ? 'foto' : 'fotos'}</span>
+                    <span class="chevron">▼</span>
+                </div>
             </div>
             <div class="day-content">
-                <button class="btn-download-day" onclick="event.stopPropagation(); downloadDayPhotos('${dateStr}')">📥 Baixar Todo o Dia (${dayPhotos.length})</button>
+                <button class="btn-download-day" onclick="event.stopPropagation(); downloadDayPhotos('${dateStr}')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2.5" fill="none">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Baixar Dia Completo (${dayPhotos.length})
+                </button>
                 <div class="photos-grid">
                     ${gridHtml}
                 </div>
@@ -119,7 +160,6 @@ function loadAndRenderPhotos() {
     }
 }
 
-// Lógica de abrir e fechar ao clicar na barra do dia
 function toggleSection(headerElement) {
     const parentGroup = headerElement.parentElement;
     parentGroup.classList.toggle('active');

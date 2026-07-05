@@ -2,202 +2,304 @@
     --bg-color: #0f172a;
     --card-bg: #1e293b;
     --primary: #3b82f6;
-    --primary-hover: #2563eb;
+    --primary-grad: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     --text: #f8fafc;
     --text-muted: #94a3b8;
-    --border: #334155;
+    --border: rgba(255, 255, 255, 0.08);
 }
 
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
     background-color: var(--bg-color);
     color: var(--text);
-    padding-bottom: 40px;
+    padding-bottom: 50px;
 }
 
+/* 1. Cabeçalho Fixo Translúcido (Glassmorphism) */
 .top-bar {
-    background-color: var(--card-bg);
-    padding: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 16px 20px;
     text-align: center;
     border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
 }
 
 .top-bar h1 {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
+    font-size: 1.35rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 3px;
+    color: #ffffff;
 }
 
 .top-bar p {
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+}
+
+.icon-header {
+    color: var(--primary);
 }
 
 .container {
     max-width: 800px;
     margin: 20px auto;
-    padding: 0 15px;
+    padding: 0 16px;
 }
 
-/* Upload */
+/* 2. Botão de Upload com Gradiente e Elevação */
 .upload-section {
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
 .upload-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--primary);
+    gap: 10px;
+    background: var(--primary-grad);
     color: white;
     padding: 18px;
-    border-radius: 12px;
-    font-weight: bold;
-    font-size: 1.1rem;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1.05rem;
     cursor: pointer;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.5);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.upload-btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 10px -4px rgba(59, 130, 246, 0.5);
 }
 
 .upload-btn input {
     display: none;
 }
 
+/* 3. Indicador de Carregamento (Spinner CSS) */
 .loading {
-    text-align: center;
-    margin-top: 15px;
-    color: #fbbf24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    background: rgba(30, 41, 59, 0.6);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    color: #38bdf8;
+    font-size: 0.9rem;
     font-weight: 500;
 }
 
-.hidden {
-    display: none;
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(56, 189, 248, 0.2);
+    border-top-color: #38bdf8;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
-/* GRUPO DO DIA (Aba Retrátil) */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* 4. Grupo do Dia (Sanfona Moderna com Card Elevation) */
 .day-group {
     background-color: var(--card-bg);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    margin-bottom: 15px;
-    overflow: hidden; /* Garante que o conteúdo sumirá ao fechar */
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
 }
 
-/* Cabeçalho que vira o botão de abrir/fechar */
 .day-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px;
-    background-color: #1e293b;
+    padding: 16px 18px;
+    background-color: rgba(30, 41, 59, 0.95);
     cursor: pointer;
     user-select: none;
     transition: background 0.2s;
 }
 
 .day-header:active {
-    background-color: #2d3748;
+    background-color: #263346;
+}
+
+.day-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .day-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     color: var(--text);
+}
+
+/* 5. Pill Badge de Contagem de Fotos */
+.header-right {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-/* Ícone de seta para indicar que abre/fecha */
-.day-header::after {
-    content: '▼';
-    font-size: 0.8rem;
+.photo-badge {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #60a5fa;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.chevron {
     color: var(--text-muted);
-    transition: transform 0.3s;
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
 }
 
-/* Quando a aba estiver aberta, a seta gira para cima */
-.day-group.active .day-header::after {
+.day-group.active .chevron {
     transform: rotate(180deg);
 }
 
-/* Conteúdo interno da aba (Fotos + Botão Geral) */
+/* Conteúdo da Aba */
 .day-content {
-    max-height: 0; /* Começa fechado */
+    max-height: 0;
     opacity: 0;
-    padding: 0 15px;
-    transition: max-height 0.3s ease-out, opacity 0.2s, padding 0.3s;
-    pointer-events: none; /* Desativa cliques enquanto fechado */
+    padding: 0 16px;
+    transition: max-height 0.35s ease-out, opacity 0.25s ease, padding 0.3s;
+    pointer-events: none;
 }
 
-/* Classe aplicada via JavaScript quando a aba for aberta */
 .day-group.active .day-content {
-    max-height: 2000px; /* Altura máxima grande o suficiente para conter as fotos */
+    max-height: 3000px;
     opacity: 1;
-    padding: 15px;
+    padding: 16px;
     pointer-events: auto;
     border-top: 1px solid var(--border);
 }
 
+/* Botão de Baixar Dia Inteiro */
 .btn-download-day {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background-color: #10b981;
     color: white;
     border: none;
     padding: 14px;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
     cursor: pointer;
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px -2px rgba(16, 185, 129, 0.4);
 }
 
-/* Grid de Fotos */
+.btn-download-day:active {
+    background-color: #059669;
+}
+
+/* Grid Trava 2 Colunas */
 .photos-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
 
+/* 6. Card da Foto com Horário Sobreposto */
 .photo-card {
     background-color: #0f172a;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--border);
 }
 
-.photo-card img {
+.photo-img-wrapper {
+    position: relative;
     width: 100%;
-    height: 160px;
+    height: 165px;
+    background-color: #090d16;
+}
+
+.photo-img-wrapper img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+/* Horário Sobreposto na Imagem em Degradê */
+.photo-time-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 18px 8px 6px 8px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .photo-info {
-    padding: 10px 8px;
-    text-align: center;
+    padding: 8px;
 }
 
-.photo-time {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    display: block;
-    font-weight: 500;
-}
-
+/* 7. Botão Individual Otimizado */
 .btn-download-single {
-    background-color: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background-color: rgba(255, 255, 255, 0.06);
     color: var(--text);
-    border: none;
+    border: 1px solid var(--border);
     width: 100%;
-    padding: 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.82rem;
     font-weight: 500;
     cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-download-single:active {
+    background-color: rgba(255, 255, 255, 0.12);
 }
