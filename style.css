@@ -44,7 +44,7 @@ body {
     padding: 0 15px;
 }
 
-/* Upload - Botão grande para Mobile */
+/* Upload */
 .upload-section {
     margin-bottom: 30px;
 }
@@ -61,11 +61,6 @@ body {
     font-size: 1.1rem;
     cursor: pointer;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
-    transition: background 0.2s;
-}
-
-.upload-btn:active {
-    background-color: var(--primary-hover);
 }
 
 .upload-btn input {
@@ -83,33 +78,70 @@ body {
     display: none;
 }
 
-/* Galeria por Dia - Otimizada para Celular */
+/* GRUPO DO DIA (Aba Retrátil) */
 .day-group {
     background-color: var(--card-bg);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 25px;
+    margin-bottom: 15px;
+    overflow: hidden; /* Garante que o conteúdo sumirá ao fechar */
 }
 
-/* AQUI FOI ALTERADO: Empilha data e botão confortavelmente na tela vertical */
+/* Cabeçalho que vira o botão de abrir/fechar */
 .day-header {
     display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 15px;
-    margin-bottom: 15px;
-    gap: 12px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    background-color: #1e293b;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+}
+
+.day-header:active {
+    background-color: #2d3748;
 }
 
 .day-title {
-    font-size: 1.3rem;
-    color: var(--primary);
-    text-align: center;
+    font-size: 1.2rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* AQUI FOI ALTERADO: Botão de baixar o dia inteiro mais alto e fácil de tocar */
+/* Ícone de seta para indicar que abre/fecha */
+.day-header::after {
+    content: '▼';
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+}
+
+/* Quando a aba estiver aberta, a seta gira para cima */
+.day-group.active .day-header::after {
+    transform: rotate(180deg);
+}
+
+/* Conteúdo interno da aba (Fotos + Botão Geral) */
+.day-content {
+    max-height: 0; /* Começa fechado */
+    opacity: 0;
+    padding: 0 15px;
+    transition: max-height 0.3s ease-out, opacity 0.2s, padding 0.3s;
+    pointer-events: none; /* Desativa cliques enquanto fechado */
+}
+
+/* Classe aplicada via JavaScript quando a aba for aberta */
+.day-group.active .day-content {
+    max-height: 2000px; /* Altura máxima grande o suficiente para conter as fotos */
+    opacity: 1;
+    padding: 15px;
+    pointer-events: auto;
+    border-top: 1px solid var(--border);
+}
+
 .btn-download-day {
     background-color: #10b981;
     color: white;
@@ -120,9 +152,10 @@ body {
     font-weight: bold;
     cursor: pointer;
     width: 100%;
+    margin-bottom: 15px;
 }
 
-/* AQUI FOI ALTERADO: Trava em exatamente 2 colunas no celular */
+/* Grid de Fotos */
 .photos-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -138,7 +171,6 @@ body {
     border: 1px solid var(--border);
 }
 
-/* AQUI FOI ALTERADO: Altura da foto aumentada para melhor visualização */
 .photo-card img {
     width: 100%;
     height: 160px;
@@ -158,7 +190,6 @@ body {
     font-weight: 500;
 }
 
-/* AQUI FOI ALTERADO: Botão de baixar individual mais largo */
 .btn-download-single {
     background-color: var(--border);
     color: var(--text);

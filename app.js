@@ -5,7 +5,6 @@ const fileInput = document.getElementById('fileInput');
 const loadingDiv = document.getElementById('loading');
 const galleryContainer = document.getElementById('galleryContainer');
 
-// Carregar fotos salvas ao abrir o app
 document.addEventListener('DOMContentLoaded', loadAndRenderPhotos);
 
 fileInput.addEventListener('change', async (e) => {
@@ -19,7 +18,7 @@ fileInput.addEventListener('change', async (e) => {
     }
 
     loadingDiv.classList.add('hidden');
-    fileInput.value = ''; // Limpa o input
+    fileInput.value = ''; 
     loadAndRenderPhotos();
 });
 
@@ -41,8 +40,8 @@ async function uploadImage(file) {
             const photoData = {
                 id: Date.now() + Math.random(),
                 url: data.data.url,
-                dateStr: now.toLocaleDateString('pt-BR'), // Ex: 04/07/2026
-                timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), // Ex: 20:45
+                dateStr: now.toLocaleDateString('pt-BR'), 
+                timeStr: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 
                 timestamp: now.getTime()
             };
 
@@ -56,49 +55,37 @@ async function uploadImage(file) {
     }
 }
 
-// 3. ARMAZENAMENTO (Pronto para conectar ao Supabase)
+// 3. ARMAZENAMENTO LOCAL
 function savePhotoData(photoData) {
-    // Salva localmente para funcionamento imediato do PWA
     let photos = JSON.parse(localStorage.getItem('checklist_photos')) || [];
-    photos.unshift(photoData); // Adiciona no início
+    photos.unshift(photoData); 
     localStorage.setItem('checklist_photos', JSON.stringify(photos));
-
-    /* =========================================================
-       INTEGRAÇÃO SUPABASE (Descomente quando configurar o client):
-       
-       await supabase.from('checklist_veiculos').insert([{
-           url: photoData.url,
-           data_registro: photoData.dateStr,
-           horario: photoData.timeStr
-       }]);
-    ========================================================== */
 }
 
 function getSavedPhotos() {
     return JSON.parse(localStorage.getItem('checklist_photos')) || [];
 }
 
-// 4. RENDERIZAÇÃO E AGRUPAMENTO POR DIA
+// 4. RENDERIZAÇÃO COM ABAS RETRÁTEIS
 function loadAndRenderPhotos() {
     const photos = getSavedPhotos();
     galleryContainer.innerHTML = '';
 
     if (photos.length === 0) {
-        galleryContainer.innerHTML = `<p style="text-align:center; color:#94a3b8;">Nenhuma foto registrada no checklist ainda.</p>`;
+        galleryContainer.innerHTML = `<p style="text-align:center; color:#94a3b8; margin-top:20px;">Nenhuma foto registrada no checklist ainda.</p>`;
         return;
     }
 
-    // Agrupar fotos pela chave data (dateStr)
     const grouped = photos.reduce((acc, photo) => {
         acc[photo.dateStr] = acc[photo.dateStr] || [];
         acc[photo.dateStr].push(photo);
         return acc;
     }, {});
 
-    // Renderizar cada grupo diário
+    // Renderizar cada bloco de dia como uma aba recolhível
     for (const [dateStr, dayPhotos] of Object.entries(grouped)) {
         const daySection = document.createElement('div');
-        daySection.className = 'day-group';
+        daySection.className = 'day-group'; // Pode adicionar 'active' aqui se quiser que o dia atual nasça aberto por padrão
 
         let gridHtml = '';
         dayPhotos.forEach(photo => {
@@ -109,24 +96,33 @@ function loadAndRenderPhotos() {
                     </a>
                     <div class="photo-info">
                         <span class="photo-time">🕒 ${photo.timeStr}</span>
-                        <button class="btn-download-single" onclick="downloadPhoto('${photo.url}', 'checklist_${photo.dateStr.replaceAll('/','-')}_${photo.timeStr.replaceAll(':','-')}.jpg')">⬇️ Baixar</button>
+                        <button class="btn-download-single" onclick="event.stopPropagation(); downloadPhoto('${photo.url}', 'checklist_${photo.dateStr.replaceAll('/','-')}_${photo.timeStr.replaceAll(':','-')}.jpg')">⬇️ Baixar</button>
                     </div>
                 </div>
             `;
         });
 
+        // Estrutura HTML da Aba: Cabeçalho clicável + Bloco de Conteúdo que expande
         daySection.innerHTML = `
-            <div class="day-header">
+            <div class="day-header" onclick="toggleSection(this)">
                 <h2 class="day-title">📅 ${dateStr}</h2>
-                <button class="btn-download-day" onclick="downloadDayPhotos('${dateStr}')">📥 Baixar Dia (${dayPhotos.length})</button>
             </div>
-            <div class="photos-grid">
-                ${gridHtml}
+            <div class="day-content">
+                <button class="btn-download-day" onclick="event.stopPropagation(); downloadDayPhotos('${dateStr}')">📥 Baixar Todo o Dia (${dayPhotos.length})</button>
+                <div class="photos-grid">
+                    ${gridHtml}
+                </div>
             </div>
         `;
 
         galleryContainer.appendChild(daySection);
     }
+}
+
+// Lógica de abrir e fechar ao clicar na barra do dia
+function toggleSection(headerElement) {
+    const parentGroup = headerElement.parentElement;
+    parentGroup.classList.toggle('active');
 }
 
 // 5. FUNÇÕES DE DOWNLOAD
@@ -145,7 +141,6 @@ async function downloadPhoto(url, filename) {
         window.URL.revokeObjectURL(blobUrl);
         a.remove();
     } catch (e) {
-        // Fallback caso o navegador bloqueie o blob cross-origin
         window.open(url, '_blank');
     }
 }
@@ -156,7 +151,6 @@ function downloadDayPhotos(dateStr) {
 
     alert(`Iniciando download de ${photos.length} foto(s) do dia ${dateStr}...`);
     
-    // Dispara o download sequencial com pequeno intervalo para não travar o navegador
     photos.forEach((photo, index) => {
         setTimeout(() => {
             const fileName = `checklist_${dateStr.replaceAll('/','-')}_${photo.timeStr.replaceAll(':','-')}_${index+1}.jpg`;
